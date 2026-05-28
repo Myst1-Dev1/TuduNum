@@ -2,13 +2,6 @@ import { Reminder } from '../entities/reminder.entity';
 import { ReminderPriority } from '../enums/reminder-priority.enum';
 import { ReminderStatus } from '../enums/reminder-status.enum';
 
-/**
- * Responsabilidade: definir o contrato de saída de dados de um lembrete.
- *
- * Utiliza o padrão de mapeamento explícito via método estático 'fromEntity'.
- * Isso evita o uso de serialização baseada em reflexão (class-transformer),
- * que é mais lenta e adiciona sobrecarga em tempo de execução.
- */
 export class ReminderResponseDto {
   id: string;
   title: string;
@@ -17,6 +10,7 @@ export class ReminderResponseDto {
   priority: ReminderPriority;
   status: ReminderStatus;
   recurrenceRule: string | null;
+  city: string | null;
   createdAt: Date;
 
   static fromEntity(reminder: Reminder): ReminderResponseDto {
@@ -28,6 +22,7 @@ export class ReminderResponseDto {
       priority: reminder.priority,
       status: reminder.status,
       recurrenceRule: reminder.recurrenceRule,
+      city: reminder.city,
       createdAt: reminder.createdAt,
     };
   }

@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { WeatherModule } from './weather/weather.module';
+import { WeatherAlertsModule } from './weather-alerts/weather-alerts.module';
 
 /**
  * Responsabilidade: raiz da aplicação. Registra configurações globais,
@@ -58,6 +59,7 @@ import { WeatherModule } from './weather/weather.module';
     RemindersModule,
     NotificationsModule,
     WeatherModule,
+    WeatherAlertsModule,
   ],
   providers: [
     // ThrottlerGuard global — bloqueia por IP antes de qualquer lógica de negócio

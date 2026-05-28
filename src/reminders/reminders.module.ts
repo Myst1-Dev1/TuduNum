@@ -15,5 +15,6 @@ import { RemindersService } from './reminders.service';
   imports: [TypeOrmModule.forFeature([Reminder])],
   controllers: [RemindersController],
   providers: [RemindersService, RemindersRepository],
+  exports: [RemindersService],
 })
 export class RemindersModule {}

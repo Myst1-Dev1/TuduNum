@@ -13,21 +13,10 @@ import { User } from '../../users/entities/user.entity';
 import { ReminderPriority } from '../enums/reminder-priority.enum';
 import { ReminderStatus } from '../enums/reminder-status.enum';
 
-/**
- * Responsabilidade: mapear a tabela 'reminders' no banco de dados.
- *
- * Índices:
- * - idx_reminders_user_status_date: otimiza a query principal do app que lista
- *   reminders ativos/pendentes do usuário logado ordenados por data.
- * - idx_reminders_notification: otimiza buscas síncronas de workers que rodam a cada minuto
- *   para disparar notificações locais/push.
- *
- * Soft Delete:
- * - Habilitado via deletedAt para auditoria e histórico de disparos de notificação.
- */
 @Entity('reminders')
 @Index('idx_reminders_user_status_date', ['userId', 'status', 'reminderDate'])
 @Index('idx_reminders_notification', ['status', 'notificationSent', 'reminderDate'])
+@Index('idx_reminders_weather', ['status', 'weatherChecked', 'reminderDate'])
 export class Reminder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -55,10 +44,6 @@ export class Reminder {
   })
   status: ReminderStatus;
 
-  /**
-   * O userId é mapeado explicitamente como uma coluna simples para evitar a necessidade
-   * de fazer joins ou carregar o relacionamento User inteiro em queries multi-tenant.
-   */
   @Column({ name: 'user_id' })
   userId: string;
 
@@ -66,11 +51,20 @@ export class Reminder {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  // Controle de agendamento de notificação
   @Column({ name: 'notification_sent', default: false })
   notificationSent: boolean;
 
-  // Regra de recorrência futura (padrão RRULE iCalendar)
+  @Column({ name: 'weather_checked', default: false })
+  weatherChecked: boolean;
+
+  @Column({
+    name: 'city',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  city: string | null;
+
   @Column({
     name: 'recurrence_rule',
     type: 'text',

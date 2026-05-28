@@ -36,6 +36,11 @@ export class UpdateReminderDto {
   @IsOptional()
   status?: ReminderStatus;
 
+  @IsString({ message: 'A cidade deve ser uma string' })
+  @IsOptional()
+  @MaxLength(255, { message: 'A cidade não pode exceder 255 caracteres' })
+  city?: string;
+
   @IsString({ message: 'A regra de recorrência deve ser uma string' })
   @IsOptional()
   @MaxLength(500, { message: 'A regra de recorrência não pode exceder 500 caracteres' })

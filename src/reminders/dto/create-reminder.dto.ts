@@ -8,10 +8,6 @@ import {
 } from 'class-validator';
 import { ReminderPriority } from '../enums/reminder-priority.enum';
 
-/**
- * Responsabilidade: validar o payload recebido na criação de um lembrete.
- * Assegura que o título não é vazio e que a data possui formato ISO8601 válido.
- */
 export class CreateReminderDto {
   @IsString({ message: 'O título deve ser uma string' })
   @MinLength(1, { message: 'O título não pode ser vazio' })
@@ -28,6 +24,11 @@ export class CreateReminderDto {
   @IsEnum(ReminderPriority, { message: 'A prioridade fornecida é inválida' })
   @IsOptional()
   priority?: ReminderPriority;
+
+  @IsString({ message: 'A cidade deve ser uma string' })
+  @IsOptional()
+  @MaxLength(255, { message: 'A cidade não pode exceder 255 caracteres' })
+  city?: string;
 
   @IsString({ message: 'A regra de recorrência deve ser uma string' })
   @IsOptional()

@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateReminderDto } from './dto/create-reminder.dto';
+import { Reminder } from './entities/reminder.entity';
 import { ReminderResponseDto } from './dto/reminder-response.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { ReminderStatus } from './enums/reminder-status.enum';
@@ -13,12 +14,6 @@ import { RemindersRepository } from './reminders.repository';
 export class RemindersService {
   constructor(private readonly remindersRepository: RemindersRepository) {}
 
-  /**
-   * Cria um novo lembrete contendo regras de validação temporais.
-   *
-   * Regra de Negócio:
-   * - A data do lembrete deve estar no futuro.
-   */
   async create(
     userId: string,
     dto: CreateReminderDto,
@@ -37,6 +32,7 @@ export class RemindersService {
       description: dto.description ?? null,
       reminderDate,
       priority: dto.priority,
+      city: dto.city ?? null,
       recurrenceRule: dto.recurrenceRule ?? null,
       userId,
     });
@@ -44,16 +40,13 @@ export class RemindersService {
     return ReminderResponseDto.fromEntity(reminder);
   }
 
-  /**
-   * Lista os lembretes do usuário logado de forma paginada.
-   */
   async findAll(
     userId: string,
     page = 1,
     limit = 10,
   ): Promise<{ data: ReminderResponseDto[]; total: number; page: number; limit: number }> {
     const parsedPage = Math.max(1, page);
-    const parsedLimit = Math.max(1, Math.min(100, limit)); // caps limit at 100 for safety
+    const parsedLimit = Math.max(1, Math.min(100, limit));
     const skip = (parsedPage - 1) * parsedLimit;
 
     const [reminders, total] = await this.remindersRepository.findAllByUser(
@@ -70,9 +63,6 @@ export class RemindersService {
     };
   }
 
-  /**
-   * Retorna um lembrete específico após validar o isolamento por usuário.
-   */
   async findOne(id: string, userId: string): Promise<ReminderResponseDto> {
     const reminder = await this.remindersRepository.findByIdAndUser(id, userId);
 
@@ -83,16 +73,6 @@ export class RemindersService {
     return ReminderResponseDto.fromEntity(reminder);
   }
 
-  /**
-   * Atualiza as informações do lembrete do usuário de forma parcial.
-   *
-   * Regras de Negócio:
-   * - Se a data for alterada, ela deve estar no futuro.
-   * - Se o status for alterado para concluído (COMPLETED) ou arquivado (ARCHIVED),
-   *   a notificação correspondente é considerada enviada (anulando o envio futuro).
-   * - Se a data for atualizada e o status for redefinido para PENDING,
-   *   reseta a flag 'notificationSent' para permitir novo envio.
-   */
   async update(
     id: string,
     userId: string,
@@ -116,11 +96,15 @@ export class RemindersService {
       reminder.priority = dto.priority;
     }
 
+    if (dto.city !== undefined) {
+      reminder.city = dto.city ?? null;
+      reminder.weatherChecked = false;
+    }
+
     if (dto.recurrenceRule !== undefined) {
       reminder.recurrenceRule = dto.recurrenceRule ?? null;
     }
 
-    // Validação de mudança de data
     if (dto.reminderDate !== undefined) {
       const newDate = new Date(dto.reminderDate);
       const now = new Date();
@@ -133,13 +117,12 @@ export class RemindersService {
 
       reminder.reminderDate = newDate;
 
-      // Se a data mudou e o status for pendente, reativa a notificação para a nova data
       if (reminder.status === ReminderStatus.PENDING) {
         reminder.notificationSent = false;
+        reminder.weatherChecked = false;
       }
     }
 
-    // Regra de conclusão de notificação baseada em status
     if (dto.status !== undefined) {
       reminder.status = dto.status;
 
@@ -149,9 +132,9 @@ export class RemindersService {
       ) {
         reminder.notificationSent = true;
       } else if (dto.status === ReminderStatus.PENDING) {
-        // Se voltou a ser pendente, reseta para enviar notificação (se data estiver no futuro)
         const now = new Date();
         reminder.notificationSent = reminder.reminderDate <= now;
+        reminder.weatherChecked = reminder.reminderDate <= now;
       }
     }
 
@@ -159,14 +142,22 @@ export class RemindersService {
     return ReminderResponseDto.fromEntity(updatedReminder);
   }
 
-  /**
-   * Deleta logicamente um lembrete do usuário autenticado.
-   */
   async remove(id: string, userId: string): Promise<void> {
     const deleted = await this.remindersRepository.softDelete(id, userId);
 
     if (!deleted) {
       throw new NotFoundException('Lembrete não encontrado');
     }
+  }
+
+  async findPendingWeatherAlerts(horizonHours = 6): Promise<Reminder[]> {
+    return this.remindersRepository.findPendingWeatherAlerts(
+      new Date(),
+      horizonHours,
+    );
+  }
+
+  async markWeatherAlertSent(id: string): Promise<void> {
+    await this.remindersRepository.markWeatherChecked(id);
   }
 }
