@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import databaseConfig from './config/database.config';
 import { UsersModule } from './users/users.module';
+import { RemindersModule } from './reminders/reminders.module';
 
 /**
  * Responsabilidade: raiz da aplicação. Registra configurações globais,
@@ -52,6 +53,7 @@ import { UsersModule } from './users/users.module';
     // 4. Feature modules
     UsersModule,
     AuthModule,
+    RemindersModule,
   ],
   providers: [
     // ThrottlerGuard global — bloqueia por IP antes de qualquer lógica de negócio
