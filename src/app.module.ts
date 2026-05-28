@@ -7,7 +7,9 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import databaseConfig from './config/database.config';
 import { UsersModule } from './users/users.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { WeatherModule } from './weather/weather.module';
 
 /**
  * Responsabilidade: raiz da aplicação. Registra configurações globais,
@@ -54,6 +56,8 @@ import { RemindersModule } from './reminders/reminders.module';
     UsersModule,
     AuthModule,
     RemindersModule,
+    NotificationsModule,
+    WeatherModule,
   ],
   providers: [
     // ThrottlerGuard global — bloqueia por IP antes de qualquer lógica de negócio
