@@ -6,11 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import databaseConfig from './config/database.config';
+import geolocationConfig from './geolocation/config/geolocation.config';
 import { UsersModule } from './users/users.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { WeatherModule } from './weather/weather.module';
 import { WeatherAlertsModule } from './weather-alerts/weather-alerts.module';
+import { GeolocationModule } from './geolocation/geolocation.module';
 
 /**
  * Responsabilidade: raiz da aplicação. Registra configurações globais,
@@ -34,7 +36,7 @@ import { WeatherAlertsModule } from './weather-alerts/weather-alerts.module';
     // 1. Configuração global — isGlobal:true dispensa import em cada módulo
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [databaseConfig, geolocationConfig],
       envFilePath: '.env',
     }),
 
@@ -60,6 +62,7 @@ import { WeatherAlertsModule } from './weather-alerts/weather-alerts.module';
     NotificationsModule,
     WeatherModule,
     WeatherAlertsModule,
+    GeolocationModule,
   ],
   providers: [
     // ThrottlerGuard global — bloqueia por IP antes de qualquer lógica de negócio
