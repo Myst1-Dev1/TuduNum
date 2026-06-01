@@ -10,9 +10,9 @@ import { Cloud, LoaderCircle, LucideAngularModule } from 'lucide-angular';
   template: `
     <section class="flex items-center justify-between rounded-lg border border-white/5 bg-[#11192d] px-5 py-4">
       <div>
-        <p class="text-[9px] font-bold uppercase tracking-wide text-[#8fa0bf]">Current weather</p>
+        <p class="text-[9px] font-bold uppercase tracking-wide text-[#8fa0bf]">Clima atual</p>
         <p *ngIf="loading(); else weatherContent" class="mt-1 text-sm font-semibold text-white">
-          Loading weather...
+          Carregando clima...
         </p>
 
         <ng-template #weatherContent>

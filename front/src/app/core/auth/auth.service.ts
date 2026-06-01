@@ -26,10 +26,10 @@ export class AuthService {
   private loadSession(): void {
     if (typeof window !== 'undefined') {
       const savedToken = localStorage.getItem('auth_token');
-      const savedUser = localStorage.getItem('auth_user');
-      if (savedToken && savedUser) {
+      // const savedUser = localStorage.getItem('auth_user');
+      if (savedToken) {
         this._token.set(savedToken);
-        this._currentUser.set(JSON.parse(savedUser));
+        // this._currentUser.set(JSON.parse(savedUser));
       }
     }
   }
@@ -37,7 +37,7 @@ export class AuthService {
   public login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
       tap(response => {
-        this.setSession(response.accessToken, response.user);
+        this.setSession(response.accessToken);
       })
     );
   }
@@ -45,7 +45,7 @@ export class AuthService {
   public register(data: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, data).pipe(
       tap(response => {
-        this.setSession(response.accessToken, response.user);
+        this.setSession(response.accessToken);
       })
     );
   }
@@ -59,12 +59,12 @@ export class AuthService {
     this._currentUser.set(null);
   }
 
-  private setSession(token: string, user: User): void {
+  private setSession(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
-      localStorage.setItem('auth_user', JSON.stringify(user));
+      // localStorage.setItem('auth_user', JSON.stringify(user));
     }
     this._token.set(token);
-    this._currentUser.set(user);
+    // this._currentUser.set(user);
   }
 }

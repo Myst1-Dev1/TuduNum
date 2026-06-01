@@ -42,7 +42,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   /**
    * Registra um novo usuário e retorna o par de tokens imediatamente.
@@ -125,44 +125,29 @@ export class AuthService {
     }
 
     const expiresIn = Number(
-      this.configService.get<string>(
-        'JWT_EXPIRES_IN',
-        '900',
-      ),
+      this.configService.get<string>('JWT_EXPIRES_IN', '900'),
     );
 
     return { accessToken, refreshToken, expiresIn };
   }
 
-  private async generateTokens(
-    payload: JwtPayload,
-  ): Promise<AuthTokens> {
+  private async generateTokens(payload: JwtPayload): Promise<AuthTokens> {
     const accessTokenExpiresIn = Number(
-      this.configService.get<string>(
-        'JWT_EXPIRES_IN',
-        '900',
-      ),
+      this.configService.get<string>('JWT_EXPIRES_IN', '900'),
     );
 
     const refreshTokenExpiresIn = Number(
-      this.configService.get<string>(
-        'JWT_REFRESH_EXPIRES_IN',
-        '604800',
-      ),
+      this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '604800'),
     );
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.getOrThrow<string>(
-          'JWT_SECRET',
-        ),
+        secret: this.configService.getOrThrow<string>('JWT_SECRET'),
         expiresIn: accessTokenExpiresIn,
       }),
 
       this.jwtService.signAsync(payload, {
-        secret: this.configService.getOrThrow<string>(
-          'JWT_REFRESH_SECRET',
-        ),
+        secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
         expiresIn: refreshTokenExpiresIn,
       }),
     ]);

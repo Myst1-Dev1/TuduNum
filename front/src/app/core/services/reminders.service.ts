@@ -22,7 +22,7 @@ import {
   ReminderStatus,
   ReminderPriority,
 } from '../models/reminder.model';
-import { Observable, tap, catchError, of } from 'rxjs';
+import { Observable, tap, catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

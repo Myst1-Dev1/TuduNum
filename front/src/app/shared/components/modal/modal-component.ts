@@ -1,3 +1,4 @@
+/* eslint-disable @angular-eslint/no-output-native */
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -41,14 +42,14 @@ import { LucideAngularModule, X } from 'lucide-angular';
         <form class="space-y-4 flex flex-col" [formGroup]="form" (ngSubmit)="submit()">
           <app-input
             label="Title"
-            placeholder="Teste clima 2"
+            placeholder="Ir ao mercado"
             formControlName="title"
             [error]="fieldError('title')"
           />
 
           <app-input
             label="Description"
-            placeholder="Teste 2"
+            placeholder="Fazer compras para a semana"
             formControlName="description"
           />
 
@@ -81,7 +82,7 @@ import { LucideAngularModule, X } from 'lucide-angular';
           </p>
 
           <p *ngIf="success" class="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200">
-            Reminder created successfully.
+            Lembrete criado com sucesso.
           </p>
 
           <button
@@ -89,7 +90,7 @@ import { LucideAngularModule, X } from 'lucide-angular';
             [disabled]="loading"
             class="flex w-full items-center justify-center rounded-xl bg-[#9fbcff] px-4 py-3 text-sm font-bold text-[#071226] shadow-[0_14px_28px_rgba(22,67,170,0.25)] transition hover:bg-[#b4c9ff] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {{ loading ? 'Creating...' : 'Create reminder' }}
+            {{ loading ? 'Criando...' : 'Definir lembrete' }}
           </button>
         </form>
       </section>
