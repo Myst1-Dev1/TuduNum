@@ -1,0 +1,53 @@
+<main class="min-h-screen bg-[#080f1f] text-white">
+  <div class="mx-auto flex min-h-screen w-full flex-col bg-[#090f20] shadow-2xl md:rounded-[28px] md:border md:border-white/10">
+    <app-header />
+
+    <div class="flex-1 space-y-5 px-4 pb-24 pt-4">
+      <app-calendar-widget
+        [reminders]="reminders()"
+        [initialDate]="calendarDate"
+        [initialSelectedDate]="selectedDate"
+      />
+
+      <app-weather-summary-card />
+
+      <section>
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-slate-100">Next Reminders</h2>
+          <button class="text-[9px] font-bold uppercase tracking-wide text-[#7f8daa]">See all</button>
+        </div>
+
+        <div class="space-y-3" *ngIf="reminders().length; else emptyReminders">
+          <app-reminder-card *ngFor="let reminder of reminders()" [reminder]="reminder" />
+        </div>
+
+        <ng-template #emptyReminders>
+          <div class="rounded-lg border border-white/5 bg-[#121b30] p-4 text-xs font-semibold text-[#8fa0bf]">
+            No reminders yet.
+          </div>
+        </ng-template>
+      </section>
+    </div>
+
+    <button
+      class="fixed bottom-[80px] right-4 grid h-10 w-10 place-items-center rounded-full bg-[#9fbcff] text-[#071226] shadow-[0_14px_28px_rgba(22,67,170,0.35)] transition-transform hover:scale-105 max-[430px]:right-4"
+      aria-label="Adicionar reminder"
+      (click)="openReminderModal()"
+    >
+      <lucide-angular [img]="Plus" [size]="22" [strokeWidth]="2.4"></lucide-angular>
+    </button>
+
+    <app-modal
+      [open]="isModalOpen()"
+      [loading]="createLoading()"
+      [error]="createError()"
+      [success]="createSuccess()"
+      (close)="closeReminderModal()"
+      (create)="createReminder($event)"
+    />
+
+    <div class="fixed bottom-0 left-1/2 w-full max-w-[430px] -translate-x-1/2 md:bottom-8">
+      <app-bottom-nav />
+    </div>
+  </div>
+</main>

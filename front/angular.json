@@ -38,6 +38,12 @@
           },
             "configurations": {
               "production": {
+                "optimization": {
+                  "fonts": {
+                    "inline": false
+                  }
+                },
+                "extractLicenses": false,
                 "budgets": [
                   {
                     "type": "initial",
