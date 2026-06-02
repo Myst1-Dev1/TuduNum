@@ -64,4 +64,37 @@ export class RemindersRepository {
   async markWeatherChecked(id: string): Promise<void> {
     await this.repo.update(id, { weatherChecked: true });
   }
+
+  async findPendingNotifications(now: Date): Promise<Reminder[]> {
+    return this.repo.find({
+      where: {
+        status: ReminderStatus.PENDING,
+        notificationSent: false,
+        reminderDate: LessThanOrEqual(now),
+      },
+      order: { reminderDate: 'ASC' },
+    });
+  }
+
+  async markNotificationSent(id: string): Promise<void> {
+    await this.repo.update(id, { notificationSent: true });
+  }
+
+  async claimNotification(id: string): Promise<boolean> {
+    const res = await this.repo
+      .createQueryBuilder()
+      .update(Reminder)
+      .set({ notificationSent: true })
+      .where('id = :id AND notification_sent = false', { id })
+      .returning('id')
+      .execute();
+
+    // Depending on DB driver, use affected or raw
+    const affected = (res.affected ?? (res.raw && res.raw.length ? res.raw.length : 0));
+    return affected > 0;
+  }
+
+  async unclaimNotification(id: string): Promise<void> {
+    await this.repo.update(id, { notificationSent: false });
+  }
 }

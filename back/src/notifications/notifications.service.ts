@@ -3,11 +3,13 @@ import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationResponseDto } from './dto/notification-response.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { NotificationsRepository } from './notifications.repository';
+import { NotificationDispatchService } from './dispatch/notification-dispatch.service';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
+    private readonly dispatchService: NotificationDispatchService,
   ) {}
 
   async create(
@@ -21,6 +23,9 @@ export class NotificationsService {
       message: dto.message ?? null,
       reminderId: dto.reminderId ?? null,
     });
+
+    // Dispatch asynchronously; creation is the source of truth.
+    this.dispatchService.dispatch(notification).catch(() => {});
 
     return NotificationResponseDto.fromEntity(notification);
   }

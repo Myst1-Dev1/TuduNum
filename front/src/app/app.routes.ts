@@ -12,6 +12,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'weather',
+    loadComponent: () => import('./features/weather/weather.component').then(m => m.WeatherComponent),
+    // canActivate: [authGuard]
+  },
+  {
     path: '',
     redirectTo: 'auth',
     pathMatch: 'full'

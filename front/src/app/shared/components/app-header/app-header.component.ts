@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { LucideAngularModule, Menu } from 'lucide-angular';
+import { LucideAngularModule, Menu, Bell } from 'lucide-angular';
+import { PushService } from '../../../core/services/push.service';
 
 @Component({
   selector: 'app-header',
@@ -7,25 +8,50 @@ import { LucideAngularModule, Menu } from 'lucide-angular';
   imports: [LucideAngularModule],
   template: `
     <header class="flex items-center justify-between px-4 pt-3">
-      <div class="flex items-center gap-2">
-        <button class="grid h-7 w-7 place-items-center text-[#91a0bd]" aria-label="Abrir menu">
+      <!-- <div class="flex items-center gap-2"> -->
+        <!-- <button class="grid h-7 w-7 place-items-center text-[#91a0bd]" aria-label="Abrir menu">
           <lucide-angular [img]="Menu" [size]="18" [strokeWidth]="2"></lucide-angular>
-        </button>
+        </button> -->
         <h1 class="text-[26px] font-bold leading-none text-[#9fbcff] drop-shadow-[0_0_8px_rgba(159,188,255,0.35)]">
-          TuduNu
+          TuduNum
         </h1>
-      </div>
+      <!-- </div> -->
 
-      <button class="h-8 w-8 overflow-hidden rounded-full border border-[#2a3b5d] bg-[#1b2740]" aria-label="Perfil">
-        <img
-          class="h-full w-full object-cover"
-          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80"
-          alt=""
-        />
-      </button>
+      <div class="flex items-center gap-2">
+        <button (click)="togglePush()" class="h-8 w-8 grid place-items-center text-[#91a0bd]" aria-label="Notificações">
+          <lucide-angular [img]="Bell" [size]="18" [strokeWidth]="2"></lucide-angular>
+        </button>
+
+        <button class="h-8 w-8 overflow-hidden rounded-full border border-[#2a3b5d] bg-[#1b2740]" aria-label="Perfil">
+          <img
+            class="h-full w-full object-cover"
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80"
+            alt=""
+          />
+        </button>
+      </div>
     </header>
   `,
 })
 export class AppHeaderComponent {
   readonly Menu = Menu;
+  readonly Bell = Bell;
+
+  private subscribed = false;
+
+  constructor(private push: PushService) {}
+
+  async togglePush() {
+    if (!this.subscribed) {
+      const ok = await this.push.subscribe('me');
+      this.subscribed = ok;
+      alert('Push subscription result:' + ok);
+      if (ok) alert('Inscrito para notificações');
+      else alert('Falha ao inscrever para notificações');
+    } else {
+      const ok = await this.push.unsubscribe('me');
+      this.subscribed = !ok ? this.subscribed : false;
+      if (ok) alert('Cancelado recebimento de notificações');
+    }
+  }
 }

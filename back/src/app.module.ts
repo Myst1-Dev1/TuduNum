@@ -7,12 +7,15 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import databaseConfig from './config/database.config';
 import geolocationConfig from './geolocation/config/geolocation.config';
+import vapidConfig from './push/config/vapid.config';
 import { UsersModule } from './users/users.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { WeatherModule } from './weather/weather.module';
 import { WeatherAlertsModule } from './weather-alerts/weather-alerts.module';
 import { GeolocationModule } from './geolocation/geolocation.module';
+import { PushModule } from './push/push.module';
+import { PushSubscriptionsModule } from './push-subscriptions/push-subscriptions.module';
 
 /**
  * Responsabilidade: raiz da aplicação. Registra configurações globais,
@@ -36,23 +39,22 @@ import { GeolocationModule } from './geolocation/geolocation.module';
     // 1. Configuração global — isGlobal:true dispensa import em cada módulo
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, geolocationConfig],
+      load: [databaseConfig, geolocationConfig, vapidConfig],
       envFilePath: '.env',
     }),
 
     // 2. Rate limiting global — limites padrão; endpoints críticos sobrescrevem via @Throttle()
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,  // janela de 60 segundos
-        limit: 100,  // 100 requisições/minuto por IP (padrão para rotas comuns)
+        ttl: 60000, // janela de 60 segundos
+        limit: 100, // 100 requisições/minuto por IP (padrão para rotas comuns)
       },
     ]),
 
     // 3. Banco de dados — configuração lazy via ConfigService
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) =>
-        config.getOrThrow('database'),
+      useFactory: (config: ConfigService) => config.getOrThrow('database'),
     }),
 
     // 4. Feature modules
@@ -63,6 +65,8 @@ import { GeolocationModule } from './geolocation/geolocation.module';
     WeatherModule,
     WeatherAlertsModule,
     GeolocationModule,
+    PushModule,
+    PushSubscriptionsModule,
   ],
   providers: [
     // ThrottlerGuard global — bloqueia por IP antes de qualquer lógica de negócio
