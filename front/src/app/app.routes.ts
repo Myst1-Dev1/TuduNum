@@ -14,7 +14,12 @@ export const routes: Routes = [
   {
     path: 'weather',
     loadComponent: () => import('./features/weather/weather.component').then(m => m.WeatherComponent),
-    // canActivate: [authGuard]
+    canActivate: [authGuard]
+  },
+  {
+    path: 'map',
+    loadComponent: () => import('./features/map/map.component').then(m => m.MapComponent),
+    canActivate: [authGuard]
   },
   {
     path: '',

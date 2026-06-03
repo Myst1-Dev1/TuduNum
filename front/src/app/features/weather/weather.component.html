@@ -9,7 +9,9 @@
         <div class="flex items-start justify-between">
           <div>
             <h2 class="text-base font-bold text-white tracking-wide">Localização Atual</h2>
-            <p class="text-xs text-[#75839d] mt-0.5">Sexta, 24 de Maio</p>
+            <p class="text-xs text-[#75839d] mt-0.5 capitalize">
+              {{ (weather()?.date || today) | date: "EEEE, d 'de' MMMM" : '' : 'pt-BR' }}
+            </p>
           </div>
           <div class="text-[#9fbcff]">
             <lucide-angular [img]="Cloud" [size]="28" [strokeWidth]="1.5"></lucide-angular>
@@ -17,7 +19,7 @@
         </div>
 
         <div class="mt-6 flex items-baseline gap-3">
-          <span class="text-6xl font-light tracking-tight text-white">24°</span>
+          <span class="text-6xl font-light tracking-tight text-white">{{ weather()?.temperature }}&deg;C</span>
           <div class="flex flex-col text-[10px] font-medium text-[#75839d]">
             <span class="flex items-center text-white/90">↑ 26°</span>
             <span class="flex items-center">↓ 18°</span>
@@ -27,15 +29,15 @@
         <div class="mt-6 grid grid-cols-3 border-t border-white/5 pt-4 text-center">
           <div>
             <p class="text-[9px] font-semibold uppercase tracking-wider text-[#75839d]">Umidade</p>
-            <p class="text-sm font-bold text-white mt-0.5">62%</p>
+            <p class="text-sm font-bold text-white mt-0.5">{{ weather()?.humidity }}%</p>
           </div>
           <div class="border-x border-white/5">
             <p class="text-[9px] font-semibold uppercase tracking-wider text-[#75839d]">Vento</p>
-            <p class="text-sm font-bold text-white mt-0.5">12km/h</p>
+            <p class="text-sm font-bold text-white mt-0.5">{{ weather()?.windSpeed }}km/h</p>
           </div>
           <div>
-            <p class="text-[9px] font-semibold uppercase tracking-wider text-[#75839d]">UV</p>
-            <p class="text-sm font-bold text-white mt-0.5">Baixo</p>
+            <p class="text-[9px] font-semibold uppercase tracking-wider text-[#75839d]">Descrição</p>
+            <p class="text-sm font-bold text-white mt-0.5">{{ weather()?.condition }} </p>
           </div>
         </div>
       </article>
@@ -44,30 +46,34 @@
       <h3 class="text-xs font-bold uppercase tracking-wider text-[#75839d]">Previsão por Hora</h3>
       
       <div class="flex w-full justify-around gap-3 overflow-x-auto pb-2 scrollbar-none">
-        
-        <div class="flex h-24 w-[72px] shrink-0 flex-col items-center justify-between rounded-xl border border-[#2f7dff]/30 bg-[#152445] py-3 shadow-[0_0_14px_rgba(47,125,255,0.25)]">
-          <span class="text-[10px] font-bold text-[#2f7dff]">Agora</span>
-          <lucide-angular [img]="Cloud" [size]="18" [strokeWidth]="2" class="text-[#9fbcff]"></lucide-angular>
-          <span class="text-xs font-bold text-white">24°</span>
-        </div>
+        @for (card of hourlyForecast(); track card.time) {
+          <div 
+            class="flex h-24 w-[72px] shrink-0 flex-col items-center justify-between rounded-xl py-3 transition-all duration-200"
+            [ngClass]="card.time === 'Agora' 
+              ? 'border border-[#2f7dff]/30 bg-[#152445] shadow-[0_0_14px_rgba(47,125,255,0.25)]' 
+              : 'border border-white/5 bg-[#11192d]/60'"
+          >
+            <span 
+              class="text-[10px] font-bold"
+              [ngClass]="card.time === 'Agora' ? 'text-[#2f7dff]' : 'text-[#75839d]'"
+            >
+              {{ card.time }}
+            </span>
 
-        <div class="flex h-24 w-[72px] shrink-0 flex-col items-center justify-between rounded-xl border border-white/5 bg-[#11192d]/60 py-3">
-          <span class="text-[10px] font-medium text-[#75839d]">14:00</span>
-          <lucide-angular [img]="Cloud" [size]="18" [strokeWidth]="2" class="text-[#75839d]"></lucide-angular>
-          <span class="text-xs font-bold text-white">25°</span>
-        </div>
+            <img 
+              [src]="'https://openweathermap.org/img/wn/' + card.icon + '.png'" 
+              [alt]="card.description"
+              class="w-7 h-7 object-contain"
+              [ngClass]="card.time === 'Agora' ? 'brightness-125' : 'opacity-70'"
+            />
 
-        <div class="flex h-24 w-[72px] shrink-0 flex-col items-center justify-between rounded-xl border border-white/5 bg-[#11192d]/60 py-3">
-          <span class="text-[10px] font-medium text-[#75839d]">16:00</span>
-          <lucide-angular [img]="CloudDrizzle" [size]="18" [strokeWidth]="2" class="text-[#75839d]"></lucide-angular>
-          <span class="text-xs font-bold text-white">20°</span>
-        </div>
-
-        <div class="flex h-24 w-[72px] shrink-0 flex-col items-center justify-between rounded-xl border border-white/5 bg-[#11192d]/60 py-3">
-          <span class="text-[10px] font-medium text-[#75839d]">18:00</span>
-          <lucide-angular [img]="Sun" [size]="18" [strokeWidth]="2" class="text-[#75839d]"></lucide-angular>
-          <span class="text-xs font-bold text-white">21°</span>
-        </div>
+            <span class="text-xs font-bold text-white">{{ card.temperature }}°</span>
+          </div>
+        } @empty {
+          <div class="text-xs text-[#75839d] py-4 w-full text-center animate-pulse">
+            Carregando previsões...
+          </div>
+        }
       </div>
     </section>
 

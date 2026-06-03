@@ -88,7 +88,7 @@ export class CalendarWidgetComponent implements OnInit {
   }
 
   get monthLabel(): string {
-    return this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return this.currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   }
 
   generateCalendar(): void {

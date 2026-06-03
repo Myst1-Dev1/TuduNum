@@ -5,13 +5,9 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  GEOLOCATION_PROVIDER,
-} from './interfaces/geolocation-provider.interface';
+import { GEOLOCATION_PROVIDER } from './interfaces/geolocation-provider.interface';
 import type { IGeolocationProvider } from './interfaces/geolocation-provider.interface';
-import {
-  GEOLOCATION_CACHE,
-} from './cache/geolocation-cache.interface';
+import { GEOLOCATION_CACHE } from './cache/geolocation-cache.interface';
 import type { IGeolocationCache } from './cache/geolocation-cache.interface';
 import { GeocodeResult } from './interfaces/geocode-result.interface';
 import { RouteResult } from './interfaces/route-result.interface';
@@ -140,11 +136,17 @@ export class GeolocationService {
     const cached = this.cache.get<RouteResult>(cacheKey);
 
     if (cached) {
-      this.logger.debug(`Cache hit rota: "${originAddress}" → "${destinationAddress}" [${mode}]`);
+      this.logger.debug(
+        `Cache hit rota: "${originAddress}" → "${destinationAddress}" [${mode}]`,
+      );
       return cached;
     }
 
-    const result = await this.provider.calculateRoute(origin, destination, mode);
+    const result = await this.provider.calculateRoute(
+      origin,
+      destination,
+      mode,
+    );
     this.cache.set(cacheKey, result, this.cacheTtlSeconds);
 
     this.logger.log(

@@ -1,0 +1,130 @@
+<main class="min-h-screen bg-[#080f1f] text-white">
+  <div class="mx-auto flex min-h-screen w-full flex-col bg-[#090f20] shadow-2xl md:rounded-[28px] md:border md:border-white/10">
+    <app-header />
+
+    <div class="flex-1 space-y-5 px-4 pb-24 pt-4">
+      <div class="relative flex-1 h-full min-h-[600px] w-full overflow-hidden bg-cover bg-center select-none"
+           style="background-image: url('/map-bg.webp');">
+
+        <div class="absolute inset-x-0 top-0 space-y-4 px-4 pt-4 z-10">
+          
+          <div class="flex items-center gap-3 rounded-2xl border border-white/5 bg-[#11192d]/80 px-4 py-3.5 backdrop-blur-md shadow-lg">
+            <lucide-angular [img]="Search" [size]="18" class="text-[#75839d]"></lucide-angular>
+            <input 
+              type="text" 
+              placeholder="Para onde vamos? (Destino)" 
+              [ngModel]="destinationInput()"
+              (ngModelChange)="destinationInput.set($event)"
+              (keydown.enter)="calculateCurrentRoute()"
+              class="flex-1 bg-transparent text-sm font-medium text-white placeholder-[#75839d] outline-none"
+            />
+            <lucide-angular [img]="Mic" [size]="18" class="text-[#75839d] hover:text-white cursor-pointer"></lucide-angular>
+          </div>
+
+          <div class="flex justify-center gap-3">
+            <button 
+              (click)="changeMode(travelMode.WALKING)"
+              [ngClass]="activeMode() === travelMode.WALKING 
+                ? 'border-[#2f7dff]/30 bg-[#152445]/90 text-[#9fbcff] shadow-[0_0_12px_rgba(47,125,255,0.2)]' 
+                : 'border-white/5 bg-[#11192d]/70 text-[#75839d]'"
+              class="flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-all">
+              <lucide-angular [img]="Footprints" [size]="18" [strokeWidth]="2"></lucide-angular>
+            </button>
+
+            <button 
+              (click)="changeMode(travelMode.TRANSIT)"
+              [ngClass]="activeMode() === travelMode.TRANSIT 
+                ? 'border-[#2f7dff]/30 bg-[#152445]/90 text-[#9fbcff]' 
+                : 'border-white/5 bg-[#11192d]/70 text-[#75839d]'"
+              class="flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-all">
+              <lucide-angular [img]="Bus" [size]="18"></lucide-angular>
+            </button>
+
+            <button 
+              (click)="changeMode(travelMode.DRIVING)"
+              [ngClass]="activeMode() === travelMode.DRIVING 
+                ? 'border-[#2f7dff]/30 bg-[#152445]/90 text-[#9fbcff]' 
+                : 'border-white/5 bg-[#11192d]/70 text-[#75839d]'"
+              class="flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-all">
+              <lucide-angular [img]="Car" [size]="18"></lucide-angular>
+            </button>
+          </div>
+        </div>
+
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-10">
+          @if (destinationInput() && routeInfo()) {
+            <div class="rounded-xl border border-white/5 bg-[#11192d]/90 px-3 py-2 text-center backdrop-blur-sm shadow-md max-w-[180px] truncate">
+              <p class="text-[11px] font-bold text-white tracking-wide truncate">{{ destinationInput() }}</p>
+              <p class="text-[9px] font-bold uppercase tracking-wider text-[#75839d] mt-0.5">Chegada Estimada</p>
+            </div>
+          }
+          
+          <div class="relative mt-1">
+            <div class="h-6 w-6 rounded-full border-2 border-black bg-[#9fbcff] shadow-[0_0_10px_rgba(159,188,255,0.6)]"></div>
+            <div class="absolute -right-2 -top-2 h-3 w-3 rounded-full bg-[#a38fff] border border-black"></div>
+          </div>
+        </div>
+
+        <div class="absolute right-4 bottom-56 flex flex-col gap-3 z-10">
+          <button class="flex h-10 w-10 items-center justify-center rounded-full border border-white/5 bg-[#11192d]/80 text-[#75839d] backdrop-blur-sm shadow-md hover:text-white">
+            <lucide-angular [img]="Layers" [size]="18"></lucide-angular>
+          </button>
+
+          <button (click)="getUserLocation()" class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#9fbcff] text-[#11192d] shadow-[0_4px_14px_rgba(159,188,255,0.4)] transition-transform active:scale-95">
+            <lucide-angular [img]="Compass" [size]="22" [strokeWidth]="2.5"></lucide-angular>
+          </button>
+        </div>
+
+        <div class="absolute inset-x-4 bottom-6 z-10">
+          
+          @if (loadingRoute()) {
+            <div class="rounded-3xl border border-white/5 bg-[#11192d]/85 p-6 backdrop-blur-lg text-center text-sm text-white animate-pulse">
+              Calculando melhor rota via satélite...
+            </div>
+          } 
+          @else if (routeInfo()) {
+            <div class="rounded-3xl border border-white/5 bg-[#11192d]/85 p-5 backdrop-blur-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+              
+              <div class="flex items-start justify-between">
+                <div class="space-y-0.5">
+                  <h2 class="text-base font-bold text-white tracking-wide">Rota para o Destino</h2>
+                  <p class="text-xs text-[#75839d]">Tempo estimado: {{ routeInfo()?.durationMinutes }} mins</p>
+                </div>
+                <div class="flex items-baseline gap-0.5 text-right">
+                  <span class="text-2xl font-black text-white tracking-tight">
+                    {{ routeInfo()?.distanceKm || ((routeInfo()?.distanceMeters || 0) / 1000).toFixed(1) }}
+                  </span>
+                  <span class="text-[10px] font-bold text-[#75839d] uppercase tracking-wider">KM</span>
+                </div>
+              </div>
+
+              <div class="mt-4 h-1.5 w-full rounded-full bg-[#152445]">
+                <div class="h-full w-full rounded-full bg-[#9fbcff] shadow-[0_0_8px_rgba(159,188,255,0.5)]"></div>
+              </div>
+
+              <div class="mt-5 flex gap-3">
+                <button class="flex-1 rounded-xl bg-[#9fbcff] py-3.5 text-center text-xs font-bold text-[#11192d] shadow-[0_4px_12px_rgba(159,188,255,0.3)] transition-all hover:bg-[#b5ccff]">
+                  Iniciar Navegação
+                </button>
+                
+                <button class="flex h-12 w-12 items-center justify-center rounded-xl border border-white/5 bg-[#152445]/40 text-[#75839d] hover:text-white">
+                  <lucide-angular [img]="Share2" [size]="16"></lucide-angular>
+                </button>
+              </div>
+            </div>
+          } 
+          @else {
+            <div class="rounded-3xl border border-white/5 bg-[#11192d]/85 p-4 backdrop-blur-lg text-center text-xs text-[#75839d]">
+              Insira um destino acima para calcular a quilometragem.
+            </div>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <div class="fixed z-50 bottom-0 left-1/2 w-full max-w-[430px] -translate-x-1/2 md:bottom-8">
+      <app-bottom-nav />
+    </div>
+  </div>
+</main>

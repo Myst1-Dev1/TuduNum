@@ -21,6 +21,7 @@ export class AuthService {
 
   constructor() {
     this.loadSession();
+    this.checkTokenExpiration();
   }
 
   private loadSession(): void {
@@ -50,18 +51,42 @@ export class AuthService {
     );
   }
 
-  public logout(): void {
+  private checkTokenExpiration(): void {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      const expiration = localStorage.getItem('auth_token_expiration');
+
+      if (token && expiration) {
+        // Se o horário de agora for maior que o guardado, expirou!
+        if (Date.now() > Number(expiration)) {
+          this.logout(); // Método que limpa a sessão
+        } else {
+          // Se ainda for válido, popula o seu Signal normalmente
+          this._token.set(token);
+        }
+      }
+    }
+  }
+
+  // Seu método de logout para garantir que limpa tudo
+  logout(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_token_expiration');
+      // localStorage.removeItem('auth_user');
     }
     this._token.set(null);
-    this._currentUser.set(null);
+    // Redirecionar para a tela de login se necessário
   }
 
   private setSession(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+
+      // Calcula o tempo de expiração: Agora + 15 minutos (15 * 60 * 1000 ms)
+      const expirationTime = Date.now() + 15 * 60 * 1000;
+      localStorage.setItem('auth_token_expiration', expirationTime.toString());
+      
       // localStorage.setItem('auth_user', JSON.stringify(user));
     }
     this._token.set(token);
