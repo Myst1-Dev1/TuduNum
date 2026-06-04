@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { environment } from '@env/environment';
+import { environment } from '@env/environment.prod';
 import { HourlyForecast, WeatherCityResponse, WeatherSummary } from '@core/models/weather.model';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 

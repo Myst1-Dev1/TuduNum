@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@env/environment';
+import { environment } from '@env/environment.prod';
 import { User, AuthResponse, LoginRequest, RegisterRequest } from '../models/user.model';
 import { Observable, tap } from 'rxjs';
 
@@ -52,20 +52,22 @@ export class AuthService {
   }
 
   private checkTokenExpiration(): void {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token');
-      const expiration = localStorage.getItem('auth_token_expiration');
+    if (typeof window === 'undefined') return;
 
-      if (token && expiration) {
-        // Se o horário de agora for maior que o guardado, expirou!
-        if (Date.now() > Number(expiration)) {
-          this.logout(); // Método que limpa a sessão
-        } else {
-          // Se ainda for válido, popula o seu Signal normalmente
-          this._token.set(token);
-        }
-      }
+    const token = localStorage.getItem('auth_token');
+    const expiration = localStorage.getItem('auth_token_expiration');
+
+    if (!token || !expiration) {
+      this.logout();
+      return;
     }
+
+    if (Date.now() > Number(expiration)) {
+      this.logout();
+      return;
+    }
+
+    this._token.set(token);
   }
 
   // Seu método de logout para garantir que limpa tudo
@@ -83,13 +85,21 @@ export class AuthService {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
 
-      // Calcula o tempo de expiração: Agora + 15 minutos (15 * 60 * 1000 ms)
-      const expirationTime = Date.now() + 15 * 60 * 1000;
-      localStorage.setItem('auth_token_expiration', expirationTime.toString());
-      
-      // localStorage.setItem('auth_user', JSON.stringify(user));
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+
+        if (payload.exp) {
+          const expirationTime = payload.exp * 1000; // JWT usa segundos
+          localStorage.setItem(
+            'auth_token_expiration',
+            expirationTime.toString()
+          );
+        }
+      } catch (error) {
+        console.error('Erro ao decodificar JWT:', error);
+      }
     }
+
     this._token.set(token);
-    // this._currentUser.set(user);
   }
 }
