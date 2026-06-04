@@ -18,9 +18,16 @@ import { PushService } from '../../../core/services/push.service';
       <!-- </div> -->
 
       <div class="flex items-center gap-2">
-        <button (click)="togglePush()" class="h-8 w-8 grid place-items-center text-[#91a0bd]" aria-label="Notificações">
-          <lucide-angular [img]="Bell" [size]="18" [strokeWidth]="2"></lucide-angular>
-        </button>
+        <div class="flex items-center gap-2">
+          <button (click)="togglePush()" class="relative h-8 w-8 grid place-items-center text-[#91a0bd] hover:text-white transition-colors" aria-label="Notificações">
+            <lucide-angular [img]="Bell" [size]="18" [strokeWidth]="2"></lucide-angular>
+            
+            <span class="absolute top-1 right-1 flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+          </button>
+        </div>
 
         <button class="h-8 w-8 overflow-hidden rounded-full border border-[#2a3b5d] bg-[#1b2740]" aria-label="Perfil">
           <img

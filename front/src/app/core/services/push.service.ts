@@ -10,8 +10,8 @@ interface PushSubscriptionPayload {
 
 @Injectable({ providedIn: 'root' })
 export class PushService {
-  private readonly vapidUrl = 'http://localhost:3000/push/vapid-public-key';
-  private readonly subscriptionsUrl = 'http://localhost:3000/push-subscriptions';
+  private readonly vapidUrl = 'https://lab.mystdev.com.br/api/tudu-num-api/push/vapid-public-key';
+  private readonly subscriptionsUrl = 'https://lab.mystdev.com.br/api/tudu-num-api/push-subscriptions';
 
   constructor(private swPush: SwPush, private http: HttpClient) {}
 
