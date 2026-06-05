@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 interface PushSubscriptionPayload {
   endpoint: string;
@@ -12,56 +13,70 @@ interface PushSubscriptionPayload {
 export class PushService {
   private readonly vapidUrl = 'https://lab.mystdev.com.br/api/tudu-num-api/push/vapid-public-key';
   private readonly subscriptionsUrl = 'https://lab.mystdev.com.br/api/tudu-num-api/push-subscriptions';
+  private readonly isBrowser: boolean;
 
-  constructor(private swPush: SwPush, private http: HttpClient) {}
+  constructor(
+    private swPush: SwPush,
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) platformId: object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
-  // Helper to convert base64 VAPID key to Uint8Array required by the browser
-  private urlBase64ToUint8Array(base64String: string): Uint8Array {
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
+  // Verifica se o Service Worker e Push estão habilitados e ativos no browser
+  async isSubscribed(): Promise<boolean> {
+    if (!this.isBrowser || !this.swPush.isEnabled) return false;
+    try {
+      const sub = await firstValueFrom(this.swPush.subscription);
+      return !!sub;
+    } catch {
+      return false;
     }
-    return outputArray;
   }
 
   // Request subscription and register it on the backend
   async subscribe(userId: string, userAgent?: string): Promise<boolean> {
     try {
+      if (!this.isBrowser) {
+        console.warn('[PushService] subscribe skipped: platform is not browser');
+        return false;
+      }
+      if (!this.swPush.isEnabled) {
+        console.warn('[PushService] SwPush is not enabled (Service Worker inactive or not supported)');
+        return false;
+      }
+
       const vapid = await firstValueFrom(this.http.get<{ publicKey: string }>(this.vapidUrl));
       console.debug('[PushService] fetched VAPID response:', vapid);
       if (!vapid || !vapid.publicKey) {
         console.error('[PushService] VAPID publicKey missing from response');
         return false;
       }
-      const options = { applicationServerKey: this.urlBase64ToUint8Array(vapid.publicKey), userVisibleOnly: true } as any;
-      if (!('serviceWorker' in navigator)) {
-        console.error('[PushService] Service Worker not supported in this browser');
-        return false;
-      }
 
-      // sanity check the applicationServerKey
-      if (!options.applicationServerKey || !(options.applicationServerKey instanceof Uint8Array)) {
-        console.error('[PushService] invalid applicationServerKey', options.applicationServerKey);
-        return false;
-      }
-      const sub = await this.swPush.requestSubscription(options);
+      // O SwPush do Angular espera 'serverPublicKey' como string base64url
+      const sub = await this.swPush.requestSubscription({
+        serverPublicKey: vapid.publicKey
+      });
+
       const payload: PushSubscriptionPayload = {
         endpoint: sub.endpoint,
-        keys: { p256dh: (sub as any).getKey ? this.arrayBufferToBase64((sub as any).getKey('p256dh')) : '', auth: (sub as any).getKey ? this.arrayBufferToBase64((sub as any).getKey('auth')) : '' },
+        keys: {
+          p256dh: (sub as any).getKey ? this.arrayBufferToBase64((sub as any).getKey('p256dh')) : '',
+          auth: (sub as any).getKey ? this.arrayBufferToBase64((sub as any).getKey('auth')) : ''
+        },
       };
 
       // send to backend in base64url form (replace +/ with -_)
       const toBase64Url = (b64: string) => b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
-      await this.http.post(this.subscriptionsUrl, {
-        endpoint: payload.endpoint,
-        p256dh: toBase64Url(payload.keys.p256dh),
-        auth: toBase64Url(payload.keys.auth),
-        userAgent: userAgent || navigator.userAgent,
-      }).toPromise();
+      await firstValueFrom(
+        this.http.post(this.subscriptionsUrl, {
+          endpoint: payload.endpoint,
+          p256dh: toBase64Url(payload.keys.p256dh),
+          auth: toBase64Url(payload.keys.auth),
+          userAgent: userAgent || navigator.userAgent,
+        })
+      );
 
       return true;
     } catch (err) {
@@ -72,11 +87,13 @@ export class PushService {
 
   async unsubscribe(userId: string): Promise<boolean> {
     try {
-      const sub = await this.swPush.subscription.toPromise();
+      if (!this.isBrowser || !this.swPush.isEnabled) return true;
+
+      const sub = await firstValueFrom(this.swPush.subscription);
       if (!sub) return true;
 
       const endpoint = sub.endpoint;
-      await this.http.delete(this.subscriptionsUrl, { body: { endpoint } }).toPromise();
+      await firstValueFrom(this.http.delete(this.subscriptionsUrl, { body: { endpoint } }));
       await sub.unsubscribe();
       return true;
     } catch (err) {

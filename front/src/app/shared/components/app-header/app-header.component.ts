@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LucideAngularModule, Menu, Bell } from 'lucide-angular';
 import { PushService } from '../../../core/services/push.service';
 
@@ -19,13 +19,20 @@ import { PushService } from '../../../core/services/push.service';
 
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-2">
-          <button (click)="togglePush()" class="relative h-8 w-8 grid place-items-center text-[#91a0bd] hover:text-white transition-colors" aria-label="Notificações">
+          <button (click)="togglePush()" 
+                  class="relative h-8 w-8 grid place-items-center transition-colors"
+                  [class.text-amber-400]="subscribed"
+                  [class.text-[#91a0bd]]="!subscribed"
+                  [class.hover:text-white]="!subscribed"
+                  aria-label="Notificações">
             <lucide-angular [img]="Bell" [size]="18" [strokeWidth]="2"></lucide-angular>
             
-            <span class="absolute top-1 right-1 flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-            </span>
+            @if (subscribed) {
+              <span class="absolute top-1 right-1 flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+            }
           </button>
         </div>
 
@@ -40,25 +47,29 @@ import { PushService } from '../../../core/services/push.service';
     </header>
   `,
 })
-export class AppHeaderComponent {
+export class AppHeaderComponent implements OnInit {
   readonly Menu = Menu;
   readonly Bell = Bell;
 
-  private subscribed = false;
+  subscribed = false;
 
   constructor(private push: PushService) {}
+
+  async ngOnInit() {
+    this.subscribed = await this.push.isSubscribed();
+  }
 
   async togglePush() {
     if (!this.subscribed) {
       const ok = await this.push.subscribe('me');
-      this.subscribed = ok;
-      alert('Push subscription result:' + ok);
-      if (ok) alert('Inscrito para notificações');
-      else alert('Falha ao inscrever para notificações');
+      if (ok) {
+        this.subscribed = true;
+      }
     } else {
       const ok = await this.push.unsubscribe('me');
-      this.subscribed = !ok ? this.subscribed : false;
-      if (ok) alert('Cancelado recebimento de notificações');
+      if (ok) {
+        this.subscribed = false;
+      }
     }
   }
 }
