@@ -16,7 +16,7 @@ import { Dumbbell, LucideAngularModule, Mic, RadioTower, Trash } from 'lucide-an
 
       <div class="min-w-0">
         <p class="text-[9px] font-bold uppercase tracking-wide text-[#8796b3]">
-          {{ reminder.reminderDate | date: 'hh:mm a' }}
+          {{ reminder.reminderDate | date: 'HH:mm a' }}
         </p>
         <h3 class="truncate text-xs font-semibold text-white">{{ reminder.title }}</h3>
         <p class="text-[10px] text-slate-400">{{ reminder.description }}</p>
