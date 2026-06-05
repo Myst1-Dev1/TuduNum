@@ -31,8 +31,22 @@ export class PushService {
   async subscribe(userId: string, userAgent?: string): Promise<boolean> {
     try {
       const vapid = await firstValueFrom(this.http.get<{ publicKey: string }>(this.vapidUrl));
+      console.debug('[PushService] fetched VAPID response:', vapid);
+      if (!vapid || !vapid.publicKey) {
+        console.error('[PushService] VAPID publicKey missing from response');
+        return false;
+      }
       const options = { applicationServerKey: this.urlBase64ToUint8Array(vapid.publicKey), userVisibleOnly: true } as any;
+      if (!('serviceWorker' in navigator)) {
+        console.error('[PushService] Service Worker not supported in this browser');
+        return false;
+      }
 
+      // sanity check the applicationServerKey
+      if (!options.applicationServerKey || !(options.applicationServerKey instanceof Uint8Array)) {
+        console.error('[PushService] invalid applicationServerKey', options.applicationServerKey);
+        return false;
+      }
       const sub = await this.swPush.requestSubscription(options);
       const payload: PushSubscriptionPayload = {
         endpoint: sub.endpoint,
