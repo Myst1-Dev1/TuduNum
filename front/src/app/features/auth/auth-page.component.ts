@@ -27,13 +27,13 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
               <rect x="13" y="11" width="3" height="2" rx="0.5" fill="#3b82f6"/>
             </svg>
           </div>
-          <h1 class="text-3xl font-bold text-white tracking-wide drop-shadow-[0_0_12px_rgba(255,255,255,0.1)]">TuduNu</h1>
-          <p class="text-gray-400 text-sm mt-2 font-medium tracking-tight">Master your time, master your world.</p>
+          <h1 class="text-3xl font-bold text-white tracking-wide drop-shadow-[0_0_12px_rgba(255,255,255,0.1)]">TuduNum</h1>
+          <p class="text-gray-400 text-sm mt-2 font-medium tracking-tight">Domine seu tempo, domine seu mundo.</p>
         </div>
 
         <div class="w-full bg-[#111c35]/70 backdrop-blur-md border border-[#1e2d4a] rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
           <h2 class="text-2xl font-semibold text-white mb-6">
-            {{ mode() === 'login' ? 'Welcome Back' : 'Create Account' }}
+            {{ mode() === 'login' ? 'Bem vindo' : 'Crie sua Conta' }}
           </h2>
 
           <div *ngIf="errorMessage()" class="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-2" role="alert">
@@ -42,7 +42,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
           <form *ngIf="mode() === 'login'" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()" novalidate class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Email Address</label>
+              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Endereço de Email</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
@@ -54,8 +54,8 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
             <div>
               <div class="flex justify-between items-center mb-2">
-                <label class="text-xs font-semibold text-gray-400 tracking-wider">Password</label>
-                <a href="#" class="text-xs font-semibold text-[#3b82f6] hover:underline">Forgot?</a>
+                <label class="text-xs font-semibold text-gray-400 tracking-wider">Senha</label>
+                <a href="#" class="text-xs font-semibold text-[#3b82f6] hover:underline">Esqueceu a senha?</a>
               </div>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
@@ -72,14 +72,14 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
             <button type="submit" [disabled]="loginForm.invalid || isSubmitting()"
               class="w-full bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-50 disabled:pointer-events-none text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 mt-2 shadow-[0_4px_20px_rgba(59,130,246,0.3)]">
-              <span>{{ isSubmitting() ? 'Connecting...' : 'Log In' }}</span>
+              <span>{{ isSubmitting() ? 'Entrando...' : 'Entrar' }}</span>
               <svg *ngIf="!isSubmitting()" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </button>
           </form>
 
           <form *ngIf="mode() === 'register'" [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()" novalidate class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Full Name</label>
+              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Nome Completo</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -90,7 +90,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Email Address</label>
+              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Endereço de Email</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
@@ -101,7 +101,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Password</label>
+              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Senha</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -116,7 +116,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Confirm Password</label>
+              <label class="block text-xs font-semibold text-gray-400 mb-2 tracking-wider">Confirme a senha</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-500">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -132,7 +132,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
             <button type="submit" [disabled]="registerForm.invalid || isSubmitting()"
               class="w-full bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-50 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 mt-2">
-              <span>{{ isSubmitting() ? 'Creating...' : 'Sign Up' }}</span>
+              <span>{{ isSubmitting() ? 'Criando...' : 'Criar Conta' }}</span>
             </button>
           </form>
 
@@ -140,7 +140,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
             <div class="absolute inset-0 flex items-center">
               <div class="w-full border-t border-[#1e2d4a]"></div>
             </div>
-            <span class="relative bg-[#15223e] px-3 text-[10px] font-bold tracking-wider text-gray-500 uppercase">Or continue with</span>
+            <span class="relative bg-[#15223e] px-3 text-[10px] font-bold tracking-wider text-gray-500 uppercase">Ou continue com</span>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -162,10 +162,10 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
         <div class="mt-6 text-center text-xs tracking-wide">
           <span class="text-gray-500">
-            {{ mode() === 'login' ? "Don't have an account?" : "Already have an account?" }}
+            {{ mode() === 'login' ? "Não tem uma conta?" : "Já tem uma conta?" }}
           </span>
           <button (click)="toggleMode()" class="ml-1 font-semibold text-gray-300 hover:text-white transition-colors focus:outline-none underline decoration-[#1e2d4a] hover:decoration-[#3b82f6]">
-            {{ mode() === 'login' ? 'Sign up for free' : 'Log in here' }}
+            {{ mode() === 'login' ? 'Criar conta' : 'Entrar' }}
           </button>
         </div>
 
